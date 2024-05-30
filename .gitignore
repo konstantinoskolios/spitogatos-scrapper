@@ -1,1 +1,5 @@
+# Ignore all the files
 *.txt
+
+#Unignore Specific .txt files
+!requirements.txt
