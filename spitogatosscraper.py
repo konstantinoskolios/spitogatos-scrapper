@@ -2,7 +2,13 @@ from bs4 import BeautifulSoup as bs
 import cfscrape
 from collections import OrderedDict
 import time
+import logging
 
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    filename='output2.log',
+                    filemode='w',
+                    encoding='utf-8')  # Specify UTF-8 encoding
 min_area = 40
 max_rent = 500
 floor = 1  # Use appropriate values (e.g., 'ypogeio', 'isogeio', 1, 2, 3)
@@ -25,13 +31,12 @@ def scrape_properties(url):
     
     soup = bs(response.text, "html.parser")
 
-    print(soup)
-
+    log_print(f'{soup}')
     time.sleep(3)
 
-    data = soup.find_all('article', class_='ordered-element')
+    data = soup.prettify()
     
-    print(data)
+    log_print(f'{data}')
 
     raise SystemExit
 
@@ -71,6 +76,9 @@ def remove_duplicates(input,output):
 
     with open(output, 'w') as file:
         file.writelines(unique_lines)
+
+def log_print(message):
+    logging.info(message)
 
 if __name__ == '__main__':
     properties = scrape_properties(f"{url}/selida_{1}")
