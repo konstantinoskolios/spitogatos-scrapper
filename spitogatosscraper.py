@@ -1,30 +1,13 @@
 from bs4 import BeautifulSoup as bs
 import cfscrape
 from collections import OrderedDict
-# import time
 import logging
 import re
 import json
-
-# logging.basicConfig(level=logging.INFO,
-#                     format='%(asctime)s - %(levelname)s - %(message)s',
-#                     filename='test/test1.log',
-#                     filemode='w',
-#                     encoding='utf-8')
-
-# Filters 
-min_area = 40
-max_rent = 500
-floor = 1  # Use appropriate values (e.g., 'ypogeio', 'isogeio', 1, 2, 3)
-min_bedrooms = 1
-pageNo = 1 # How many Pages you wanna scrape, avoid too much cause you will get a ban from antibotting,  i will find a way in the future to avoid this
+import argparse
 
 # Base Url
 base_url = "https://www.spitogatos.gr"
-
-# Params Url
-url = f"{base_url}/enoikiaseis-katoikies/pollaples_perioxes-101,102,103,104/orofos_apo_{floor}/timi_eos-{max_rent}/emvado_apo-{min_area}/dwmatia_apo-{min_bedrooms}"
-
 
 # Regex Patterns
 location_pattern = re.compile(r'\((.*?)\)')
@@ -41,19 +24,11 @@ def scrape_properties(url,pageNo):
         print(f"Error: Received status code {response.status_code}")
         return None
 
-    # with open("holy-bible.html","r",encoding="utf-8") as file:
-        # html_content = file.read()
-
-    
     soup = bs(response.text, "html.parser")
-    # soup = bs(html_content, "html.parser")
 
-
-    # data = soup.prettify()
     data = soup.findAll('article',class_='ordered-element')    
 
     properties = {}
-
 
     for d in data:
         title = d.find('h3',class_='tile__title').text.strip()
@@ -78,31 +53,31 @@ def scrape_properties(url,pageNo):
         properties[href_apply_pref] = result
 
     json_string = json.dumps(properties, indent=4, ensure_ascii=False)
-    sample_file_name = f"samples/sample{pageNo}.json"
+    sample_file_name = f"samples/{url_to_filename(url)}"
     with open(sample_file_name,"w",encoding="utf-8") as outputFile:
         outputFile.write(json_string)
 
-
 def log_print(message):
     logging.info(message)
+    
+import os
+
+def url_to_filename(url):
+    url = url.replace('https://www.spitogatos.gr/', '')
+    url = re.sub(r'[^a-zA-Z0-9-_./]+', '_', url)
+    url = url.strip('_')
+    url = re.sub(r'_{2,}', '_', url)
+    url = url.replace('/', '-')
+    url += '.json'
+    return url
+
 
 if __name__ == '__main__':
-    for i in range(5,7):
-        properties = scrape_properties(f"{url}/selida_{i}",f"{i}")
+    parser = argparse.ArgumentParser(description='Scrape properties from multiple pages.')
+    parser.add_argument('url', type=str, help='Base URL for scraping')
+    parser.add_argument('start_page', type=int, help='Start page number')
+    parser.add_argument('end_page', type=int, help='End page number')
+    args = parser.parse_args()
 
-
-'''
-def save_to_file(properties,page):
-    if not properties:
-        print("No data to save.")
-        return
-
-    filename = f"properties-{page}.txt"
-    try:
-        with open(filename, "w") as file:
-            for prop in properties:
-                file.write(f'{prop}')
-        print("Data saved to properties-{page}.txt")  
-    except IOError as e:
-        print(f"An error orccured while saving the file: {e}")    
-'''
+    for i in range(args.start_page, args.end_page + 1):
+        properties = scrape_properties(f"{args.url}/selida_{i}", f"{i}")

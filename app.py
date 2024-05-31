@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Load JSON data from file with utf-8 encoding
-with open('output_all_json.json', 'r', encoding='utf-8') as json_file:
+with open('samples/all_samples.json', 'r', encoding='utf-8') as json_file:
     jd = json.load(json_file)
 
 # Initialize dictionary to hold location data
@@ -27,7 +27,7 @@ for k, v in jd.items():
 median_price_per_sqm = {}
 average_price_per_sqm = {}
 for location, values in location_data.items():
-    if values['count'] >= 10:  # Considering only locations with 10 or more samples
+    if values['count'] >= 5:  # Considering only locations with 5 or more samples
         median_price_per_sqm[location] = np.median(values['prices_per_sqm'])
         average_price_per_sqm[location] = values['total_price'] / values['total_sqm']
 

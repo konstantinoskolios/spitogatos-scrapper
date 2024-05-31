@@ -12,5 +12,5 @@ for file_path in os.listdir("samples"):
     data = json_to_dict(f"samples/{file_path}")
     combined_data.update(data)
         
-with open("output_all_json.json","w",encoding="utf-8") as file:
+with open("samples/all_samples.json","w",encoding="utf-8") as file:
     json.dump(combined_data,file,ensure_ascii=False, indent=4)

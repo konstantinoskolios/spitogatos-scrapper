@@ -1,7 +1,7 @@
 # Ignore all the files
 *.txt
 *.log
-*.json
+# *.json
 *.html
 
 #Unignore Specific .txt files
