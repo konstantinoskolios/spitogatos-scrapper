@@ -1,6 +1,8 @@
 # Ignore all the files
 *.txt
 *.log
+*.json
+*.html
 
 #Unignore Specific .txt files
 !requirements.txt
